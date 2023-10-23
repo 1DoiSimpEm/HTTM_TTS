@@ -30,7 +30,7 @@
     <string name="CANCEL">Cancel</string>
     <string name="stop">Stop</string>
     <string name="save">Save</string>
-    <string name="tts_hint">"Enter text to generate audio, then add voice effects!"</string>
+    <string name="tts_hint">"Enter text to generate audio!"</string>
     <string name="normal">Normal</string>
     <string name="girl">Girl</string>
     <string name="woman">Woman</string>

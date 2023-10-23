@@ -1,4 +1,4 @@
-package group.nhom14.textospeech.ui.play_audio
+package group.nhom14.textospeech.ui.main
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -15,9 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import group.nhom14.textospeech.model.AudioFile
 import group.nhom14.textospeech.util.DownloadUtil
 import group.nhom14.textospeech.R
-import group.nhom14.textospeech.databinding.FragmentPlayAudioBinding
-import group.nhom14.textospeech.ui.AudioAdapter
-import group.nhom14.textospeech.ui.AudioViewModel
+import group.nhom14.textospeech.databinding.FragmentAudioBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,8 +30,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-class PlayAudioFragment : Fragment() {
-    private lateinit var mBinding: FragmentPlayAudioBinding
+class AudioFragment : Fragment() {
+    private lateinit var mBinding: FragmentAudioBinding
     private val viewModel: AudioViewModel by activityViewModels()
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var audioAdapter: AudioAdapter
@@ -45,20 +43,23 @@ class PlayAudioFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        mBinding = FragmentPlayAudioBinding.inflate(inflater, container, false)
+    ): View {
+        mBinding = FragmentAudioBinding.inflate(inflater, container, false)
         return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initData()
+        initView()
+        initActions()
     }
 
 
     private fun initView() {
         audioAdapter = AudioAdapter(
             itemClick = {
-
+                        parentFragmentManager.
             },
             itemLongClick = {
 
@@ -70,7 +71,7 @@ class PlayAudioFragment : Fragment() {
     }
 
     private fun initData() {
-        viewModel.audioList.observe(this) {
+        viewModel.audioList.observe(viewLifecycleOwner) {
             audioAdapter.updateList(it)
         }
     }

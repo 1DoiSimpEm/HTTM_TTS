@@ -75,6 +75,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
     implementation 'androidx.fragment:fragment-ktx:1.6.1'
+    implementation  'com.github.massoudss:waveformSeekBar:5.0.2'
+    implementation 'com.github.lincollincol:amplituda:2.2.2'
 
 
 }

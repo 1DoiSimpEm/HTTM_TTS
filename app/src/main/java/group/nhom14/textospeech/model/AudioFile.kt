@@ -1,4 +1,4 @@
-package group.nhom14.textospeech
+package group.nhom14.textospeech.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

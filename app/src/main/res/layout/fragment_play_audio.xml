@@ -1,14 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.play_audio.PlayAudioFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="12dp"
+        android:src="@drawable/baseline_arrow_back_24"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"/>
 
-</FrameLayout>
+    <ImageView
+        android:id="@+id/btn_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="12dp"
+        android:src="@drawable/ic_share"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"/>
+    <ImageView
+        android:id="@+id/playMyWorkAudio_imgDisk"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="72dp"
+        android:src="@drawable/ic_play_disk"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.masoudss.lib.WaveformSeekBar
+        android:id="@+id/playMyWorkAudio_seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginHorizontal="70dp"
+        app:layout_constraintBottom_toTopOf="@+id/playMyWorkAudio_playBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playMyWorkAudio_imgDisk"
+        android:layout_marginTop="48dp"
+        app:wave_background_color="@color/sub_color"
+        app:wave_corner_radius="1dp"
+        app:wave_gap="2dp"
+        app:wave_gravity="center"
+        app:wave_max_progress="100"
+        app:wave_min_height="5dp"
+        app:wave_progress="33"
+        app:wave_progress_color="@color/color_main"
+        app:wave_width="2dp" />
+    <!--            app:layout_constraintEnd_toStartOf="@+id/playMyWorkAudio_durationTxt"-->
+    <!--            app:layout_constraintStart_toEndOf="@+id/playMyWorkAudio_progressTxt"-->
+
+
+    <TextView
+        android:id="@+id/playMyWorkAudio_progressTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="TextView"
+        android:textColor="@color/color_black"
+        app:layout_constraintBottom_toBottomOf="@+id/playMyWorkAudio_seekBar"
+        app:layout_constraintEnd_toStartOf="@+id/playMyWorkAudio_seekBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/playMyWorkAudio_seekBar" />
+
+    <TextView
+        android:id="@+id/playMyWorkAudio_durationTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="TextView"
+        android:textColor="@color/color_black"
+        app:layout_constraintBottom_toBottomOf="@+id/playMyWorkAudio_seekBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/playMyWorkAudio_seekBar"
+        app:layout_constraintTop_toTopOf="@+id/playMyWorkAudio_seekBar" />
+
+    <ImageView
+        android:id="@+id/playMyWorkAudio_playBtn"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:src="@drawable/ic_pause_mywork_audio"
+        android:layout_marginTop="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playMyWorkAudio_seekBar" />
+
+    <ImageView
+        android:id="@+id/playMyWorkAudio_previousBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="33dp"
+        android:src="@drawable/ic_previous_audio"
+        app:layout_constraintBottom_toBottomOf="@+id/playMyWorkAudio_playBtn"
+        app:layout_constraintEnd_toStartOf="@+id/playMyWorkAudio_playBtn"
+        app:layout_constraintTop_toTopOf="@+id/playMyWorkAudio_playBtn" />
+
+    <ImageView
+        android:id="@+id/playMyWorkAudio_nextBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="33dp"
+        android:src="@drawable/ic_next_audio"
+        app:layout_constraintBottom_toBottomOf="@+id/playMyWorkAudio_playBtn"
+        app:layout_constraintStart_toEndOf="@+id/playMyWorkAudio_playBtn"
+        app:layout_constraintTop_toTopOf="@+id/playMyWorkAudio_playBtn" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

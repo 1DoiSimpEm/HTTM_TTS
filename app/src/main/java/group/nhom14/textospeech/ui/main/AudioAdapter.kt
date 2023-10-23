@@ -1,4 +1,4 @@
-package group.nhom14.textospeech.ui
+package group.nhom14.textospeech.ui.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

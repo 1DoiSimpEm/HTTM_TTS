@@ -1,4 +1,4 @@
-package group.nhom14.textospeech.ui
+package group.nhom14.textospeech.ui.main
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -44,6 +44,10 @@ class AudioViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             audioFileDao.update(id, name)
         }
+    }
+
+    fun shareFile(audioFile: AudioFile){
+
     }
 
 

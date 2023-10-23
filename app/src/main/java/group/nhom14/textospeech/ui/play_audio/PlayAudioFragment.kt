@@ -1,60 +1,145 @@
 package group.nhom14.textospeech.ui.play_audio
 
+import android.animation.ObjectAnimator
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.masoudss.lib.SeekBarOnProgressChanged
+import com.masoudss.lib.WaveformSeekBar
 import group.nhom14.textospeech.R
+import group.nhom14.textospeech.databinding.FragmentPlayAudioBinding
+import group.nhom14.textospeech.model.AudioFile
+import group.nhom14.textospeech.ui.main.AudioViewModel
+import group.nhom14.textospeech.util.Util.formatMinSec
+import kotlinx.coroutines.launch
+import java.io.File
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [PlayAudioFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PlayAudioFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var mBinding: FragmentPlayAudioBinding
+    private val viewModel: AudioViewModel by activityViewModels()
+    private lateinit var mMediaPlayer: MediaPlayer
+    private lateinit var anim: ObjectAnimator
+    private lateinit var audioList: MutableList<AudioFile>
+    private lateinit var audioFile: AudioFile
+    private var seekBarUpdater: Handler? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    companion object {
+        fun newInstance(file: AudioFile): PlayAudioFragment {
+            val args = Bundle()
+            val fragment = PlayAudioFragment()
+            fragment.arguments = args
+            fragment.audioFile = file
+            return fragment
         }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_play_audio2, container, false)
+    ): View {
+        mBinding = FragmentPlayAudioBinding.inflate(inflater, container, false)
+        return mBinding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PlayAudioFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            PlayAudioFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initViews()
+        initActions()
     }
+
+    private fun initActions() {
+        mBinding.btnBack.setOnClickListener {
+            activity?.onBackPressed()
+        }
+        mBinding.btnShare.setOnClickListener {
+            viewModel.shareFile(audioFile)
+        }
+        mBinding.playMyWorkAudioPlayBtn.setOnClickListener {
+            if (mMediaPlayer.isPlaying)
+                pauseAudio()
+            else
+                resumeAudio()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                mBinding.playMyWorkAudioSeekBar?.onProgressChanged =
+                    object : SeekBarOnProgressChanged {
+                        override fun onProgressChanged(
+                            waveformSeekBar: WaveformSeekBar,
+                            progress: Float,
+                            fromUser: Boolean
+                        ) {
+                            if (fromUser)
+                                mMediaPlayer.seekTo(progress.toInt())
+                        }
+
+                    }
+            }
+        }
+
+    }
+
+    private fun initViews() {
+        viewModel.audioList.observe(viewLifecycleOwner){
+            audioList = it as MutableList<AudioFile>
+        }
+        mMediaPlayer = MediaPlayer.create(context, Uri.fromFile(File(audioFile.filePath)))
+        mMediaPlayer.isLooping = true
+        mMediaPlayer.start()
+
+        anim =
+            ObjectAnimator.ofFloat(mBinding?.playMyWorkAudioImgDisk, "rotation", 0f, 360f).apply {
+                duration = 3000
+                repeatCount = ObjectAnimator.INFINITE
+                interpolator = LinearInterpolator()
+                start()
+            }
+        mBinding?.playMyWorkAudioProgressTxt?.text = mMediaPlayer.currentPosition.formatMinSec()
+        mBinding?.playMyWorkAudioDurationTxt?.text = mMediaPlayer.duration.formatMinSec()
+
+        seekBarUpdater = Handler(Looper.getMainLooper())
+        mBinding?.playMyWorkAudioSeekBar?.maxProgress = mMediaPlayer.duration.toFloat()
+        seekBarUpdater?.post(object : Runnable {
+            override fun run() {
+                try {
+                    mBinding?.playMyWorkAudioSeekBar?.progress =
+                        mMediaPlayer.currentPosition.toFloat()
+                    mBinding?.playMyWorkAudioProgressTxt?.text =
+                        mMediaPlayer.currentPosition.formatMinSec()
+                } catch (_: Exception) {
+                }
+                seekBarUpdater?.postDelayed(this, 50)
+            }
+        })
+
+    }
+
+
+    private fun resumeAudio() {
+        mMediaPlayer.start()
+        anim.resume()
+        mBinding.playMyWorkAudioPlayBtn.setImageResource(R.drawable.ic_pause_mywork_audio)
+    }
+
+    private fun pauseAudio() {
+        mMediaPlayer.pause()
+        anim.pause()
+        mBinding.playMyWorkAudioPlayBtn.setImageResource(R.drawable.ic_play_mywork_audio)
+    }
+
 }
