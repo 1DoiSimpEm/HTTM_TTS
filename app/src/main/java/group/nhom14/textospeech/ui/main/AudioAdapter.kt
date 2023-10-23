@@ -1,13 +1,16 @@
-package group.nhom14.textospeech
+package group.nhom14.textospeech.ui
 
-import android.media.MediaMetadataRetriever
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import group.nhom14.textospeech.model.AudioFile
 import group.nhom14.textospeech.databinding.ItemAudioBinding
-import java.io.File
 
-class Adapter(val itemClick: (AudioFile) -> Unit) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+class AudioAdapter(
+    val itemClick: (AudioFile) -> Unit,
+    val itemLongClick:(AudioFile) -> Unit
+)
+    : RecyclerView.Adapter<AudioAdapter.ViewHolder>() {
     private var files: MutableList<AudioFile> = mutableListOf()
 
 
@@ -18,6 +21,10 @@ class Adapter(val itemClick: (AudioFile) -> Unit) : RecyclerView.Adapter<Adapter
 //            mBinding.explorerItemAudioLength.text = getAudioDuration(audioFile.filePath).toString()
             itemView.setOnClickListener {
                 itemClick(audioFile)
+            }
+            itemView.setOnLongClickListener {
+                itemLongClick(audioFile)
+                true
             }
         }
     }
