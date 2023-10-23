@@ -16,6 +16,9 @@ import group.nhom14.textospeech.model.AudioFile
 import group.nhom14.textospeech.util.DownloadUtil
 import group.nhom14.textospeech.R
 import group.nhom14.textospeech.databinding.FragmentAudioBinding
+import group.nhom14.textospeech.ui.dialog.OptionBottomSheetFragment
+import group.nhom14.textospeech.ui.dialog.RenameDialogFragment
+import group.nhom14.textospeech.ui.play_audio.PlayAudioFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,7 +39,7 @@ class AudioFragment : Fragment() {
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var audioAdapter: AudioAdapter
 
-    companion object{
+    companion object {
         private const val BASE_URL = "https://7282-14-231-130-155.ngrok-free.app"
     }
 
@@ -59,15 +62,35 @@ class AudioFragment : Fragment() {
     private fun initView() {
         audioAdapter = AudioAdapter(
             itemClick = {
-                        parentFragmentManager.
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.main_container, PlayAudioFragment.newInstance(it))
+                    .addToBackStack(PlayAudioFragment::class.java.name)
+                    .commit()
             },
             itemLongClick = {
+                OptionBottomSheetFragment(object :
+                    OptionBottomSheetFragment.OptionBottomSheetListener {
+                    override fun rename() {
+                        RenameDialogFragment.newInstance(it.name){name ->
+                            viewModel.update(it.id, name)
+                        }.show(parentFragmentManager, RenameDialogFragment::class.java.name)
+                    }
 
-            }
+                    override fun share() {
+                        viewModel.shareFile(context ?: return, it)
+                    }
 
-        )
+                    override fun setRingtone() {
+                        viewModel.setRingtone(context ?: return, it.filePath, it.name)
+                    }
+                    override fun delete() {
+                        viewModel.delete(it)
+                    }
+                })
+
+
+            })
         mBinding.ttsRecyclerView.adapter = audioAdapter
-
     }
 
     private fun initData() {
@@ -165,7 +188,8 @@ class AudioFragment : Fragment() {
     }
 
 
-    private suspend fun getAudioId(url: String): String? = suspendCoroutine { continuation ->
+    private suspend
+    fun getAudioId(url: String): String? = suspendCoroutine { continuation ->
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
         client.newCall(request).enqueue(object : Callback {

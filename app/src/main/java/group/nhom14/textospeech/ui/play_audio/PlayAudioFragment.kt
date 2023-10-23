@@ -65,7 +65,7 @@ class PlayAudioFragment : Fragment() {
             activity?.onBackPressed()
         }
         mBinding.btnShare.setOnClickListener {
-            viewModel.shareFile(audioFile)
+            viewModel.shareFile(context ?: return@setOnClickListener,audioFile)
         }
         mBinding.playMyWorkAudioPlayBtn.setOnClickListener {
             if (mMediaPlayer.isPlaying)

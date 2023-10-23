@@ -256,4 +256,5 @@
     <string name="background">Background</string>
     <string name="thanks_for_your_feedback">Thanks for your feedback!</string>
     <string name="loading_advertisement">Loading advertisement...</string>
+    <string name="share_text_to_speech_audio">Share text to speech audio</string>
 </resources>

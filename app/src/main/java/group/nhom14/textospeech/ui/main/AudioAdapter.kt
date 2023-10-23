@@ -19,6 +19,9 @@ class AudioAdapter(
         fun bind(audioFile: AudioFile) {
             mBinding.explorerItemName.text = audioFile.name
 //            mBinding.explorerItemAudioLength.text = getAudioDuration(audioFile.filePath).toString()
+            mBinding.myWorkAudioItemThreedots.setOnClickListener {
+                itemLongClick(audioFile)
+            }
             itemView.setOnClickListener {
                 itemClick(audioFile)
             }
