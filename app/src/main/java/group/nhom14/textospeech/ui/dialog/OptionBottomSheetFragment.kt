@@ -28,7 +28,6 @@ class OptionBottomSheetFragment(
         return mBinding.root
     }
 
-
     override fun getTheme(): Int {
         return R.style.CustomBottomSheetDialog
     }

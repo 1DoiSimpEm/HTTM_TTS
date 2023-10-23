@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Voice Change</string>
+    <string name="app_name">Text To Speech</string>
 
     <string name="app_ui_crash">App/UI crashed</string>
     <string name="sorry_string">Sorry, that should not have happened.</string>

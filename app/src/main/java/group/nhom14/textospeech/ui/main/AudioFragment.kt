@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -40,7 +41,7 @@ class AudioFragment : Fragment() {
     private lateinit var audioAdapter: AudioAdapter
 
     companion object {
-        private const val BASE_URL = "https://7282-14-231-130-155.ngrok-free.app"
+        private const val BASE_URL = "https://3bdf-14-231-130-155.ngrok-free.app"
     }
 
     override fun onCreateView(
@@ -64,16 +65,15 @@ class AudioFragment : Fragment() {
             itemClick = {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.main_container, PlayAudioFragment.newInstance(it))
-                    .addToBackStack(PlayAudioFragment::class.java.name)
+                    .addToBackStack(null)
                     .commit()
             },
             itemLongClick = {
-                OptionBottomSheetFragment(object :
-                    OptionBottomSheetFragment.OptionBottomSheetListener {
+                OptionBottomSheetFragment(object : OptionBottomSheetFragment.OptionBottomSheetListener {
                     override fun rename() {
                         RenameDialogFragment.newInstance(it.name){name ->
                             viewModel.update(it.id, name)
-                        }.show(parentFragmentManager, RenameDialogFragment::class.java.name)
+                        }.show(childFragmentManager, RenameDialogFragment::class.java.name)
                     }
 
                     override fun share() {
@@ -81,12 +81,14 @@ class AudioFragment : Fragment() {
                     }
 
                     override fun setRingtone() {
-                        viewModel.setRingtone(context ?: return, it.filePath, it.name)
+                        viewModel.setRingtone(context ?: return, it.filePath, it.name){
+                            Toast.makeText(context, "Set ringtone successfully", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     override fun delete() {
                         viewModel.delete(it)
                     }
-                })
+                }).show(childFragmentManager, OptionBottomSheetFragment::class.java.name)
 
 
             })
@@ -126,7 +128,7 @@ class AudioFragment : Fragment() {
 
         mBinding.ttsPlayButton.setOnClickListener {
             mBinding.ttsProgressBar.visibility = View.VISIBLE
-            lifecycleScope.launch(Dispatchers.IO) {
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val audioId =
                     withContext(Dispatchers.Default) {
                         getAudioId("$BASE_URL/tts?text=${mBinding.ttsEditText.text}")
@@ -135,7 +137,8 @@ class AudioFragment : Fragment() {
                     withContext(Dispatchers.Main) {
                         Log.d("MainActivity", "Audio ID: $audioId")
                         mediaPlayer = MediaPlayer().apply {
-                            setDataSource("$BASE_URL/audio?id=$audioId")
+                            setDataSource("$BASE_URL/audiogen?id=$audioId")
+//                            setDataSource("https://doc-0s-7g-docs.googleusercontent.com/docs/securesc/pf90nneoelfe9erk5nq9uatm55ijlnvt/qr1nuv73fjmvl1gt7a5updoof74cc8a7/1698078975000/12097368366067485510/12097368366067485510/1fZiZjeeXRF9_HP5GpeuKm2v2GhcoFEIm?e=open&ax=AI0foUqKjPFR1kij9maUeQF4Xl4vdxEdJhusWaLhnKglU66gWwDqXSmFx1ReVZ_vioIcwdDtPQzRAAeGgvsOAF9QUEHLOzMLxNcS0cFV-sJX_PU0Cfb_-CfqWft63qcUm0uW61BDMrtUSV3xHlLg980v80bil55RuA8MCBGX2SyFRgmDrazp4dlE3IsvgVSA6daNPn54ULafHq2EVDK_CYxRk_Ry8FcN-lTchZnbx1w-B2kAOUhEt3JG1xnru7KBPHVI3gzRB7olN8NEHNUZ8OS5NFYpCtY6i4ni6dv6ovhdRZ30KKknbcDT-lx2keN3q7Ke8dBWHjKFCsR0WBAQDcGVC-uk642MwoPTeNXfOYYTGyxTK6V2Vu9CzIrQlVcmseIOUMh5Yq4QQetkHZl-5JQ1TLlzG18DjjFsi62CEJryQ9xV-JeKAk5jme8XSG6oztRmKa7LZcHrOEd9zKdSzcop6he8-1ZxnLYf9Ds_P48dkHiyAGLRtUdZ1SJ6njC7I1YkgpwaCp1Z-wswPbgk415turrna6ToFTiegSdQr8HtxEYTOFyztGSczLCeYqvkIGb7CcKsUI0TdfIK9_s-FYEvJzb79np4xj1gMm5pKXevM-WEVfhI4Vql2Z3b_JmW4ACCbRhtzZMpN19Pvv_QyIBgE0LIafXIhjPT7GD5a-D9RMXiWNbguIHjeiRY_n6Me8B1xoCyvTAzJM0X84c3L1gGcTpmXMGFxU644Azyrq7pHTxvrerLDy2ednLrVwpCkBjovMSq8Pel8_pqqYxWKGsD0n7_cjKNK-gWxUN0bivc-XnngtYYguvfOn1DezWlWV084IimTkxSkvLJ9IQJyHjCJRpWmaLuEynbcjVkHHuRNWPDo3o8XfljKx3wVlrlBYo6-jfK9e03S4gX7IY6wevoMHgXk_lLyG-v7U11sS5L_vf8nNhgAUfGf19Z-BVPyB12CzzyYTpSM0fEXEm4VtMi9ZAcTFkejuTzLK9iTCuDzCX4QTpdsd2sNHUjEj2AFZvdtLqK9kcWIZjLXO-wKWZiPCgpyQzGT0Ukm78d5H-oTLSctw&uuid=3beb7788-ad64-4876-8985-d51922a6418d&authuser=0")
                             prepare()
                             start()
                             setOnCompletionListener {
@@ -153,6 +156,7 @@ class AudioFragment : Fragment() {
                     Log.d("MainActivity", "Error getting audio ID")
                 }
             }
+
         }
 
         mBinding.ttsDownloadButton.setOnClickListener {
@@ -164,7 +168,8 @@ class AudioFragment : Fragment() {
                     }
                 if (audioId != null) {
                     DownloadUtil.downloadAudioFile(
-                        "$BASE_URL/tts?text=${mBinding.ttsEditText.text}",
+                        "$BASE_URL/audiogen?id=$audioId",
+//                        "https://35.84.154.59:4000/file/AUGHHHHH.mp3",
                         context ?: return@launch,
                     ) { success, filePath ->
                         if (success) {
@@ -174,6 +179,8 @@ class AudioFragment : Fragment() {
                                 filePath = filePath
                             )
                             viewModel.insert(audioFile)
+                            mBinding.ttsProgressBar.visibility = View.GONE
+
                         } else {
                             Log.d("MainActivity", "Error downloading file")
                         }
@@ -188,8 +195,7 @@ class AudioFragment : Fragment() {
     }
 
 
-    private suspend
-    fun getAudioId(url: String): String? = suspendCoroutine { continuation ->
+    private suspend fun getAudioId(url: String): String? = suspendCoroutine { continuation ->
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
         client.newCall(request).enqueue(object : Callback {

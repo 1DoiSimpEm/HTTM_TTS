@@ -7,11 +7,6 @@ import group.nhom14.textospeech.ui.main.AudioFragment
 
 
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-        private const val BASE_URL = "https://7282-14-231-130-155.ngrok-free.app"
-    }
-
     private lateinit var mBinding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -6,11 +6,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -77,7 +79,7 @@ class PlayAudioFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED)
             {
-                mBinding.playMyWorkAudioSeekBar?.onProgressChanged =
+                mBinding.playMyWorkAudioSeekBar.onProgressChanged =
                     object : SeekBarOnProgressChanged {
                         override fun onProgressChanged(
                             waveformSeekBar: WaveformSeekBar,
@@ -98,28 +100,29 @@ class PlayAudioFragment : Fragment() {
         viewModel.audioList.observe(viewLifecycleOwner){
             audioList = it as MutableList<AudioFile>
         }
-        mMediaPlayer = MediaPlayer.create(context, Uri.fromFile(File(audioFile.filePath)))
+        mBinding.txtTitle.text = audioFile.name
+        mMediaPlayer = MediaPlayer.create(context, audioFile.filePath.toUri())
         mMediaPlayer.isLooping = true
         mMediaPlayer.start()
-
+        mBinding.playMyWorkAudioSeekBar.setSampleFrom(audioFile.filePath)
         anim =
-            ObjectAnimator.ofFloat(mBinding?.playMyWorkAudioImgDisk, "rotation", 0f, 360f).apply {
+            ObjectAnimator.ofFloat(mBinding.playMyWorkAudioImgDisk, "rotation", 0f, 360f).apply {
                 duration = 3000
                 repeatCount = ObjectAnimator.INFINITE
                 interpolator = LinearInterpolator()
                 start()
             }
-        mBinding?.playMyWorkAudioProgressTxt?.text = mMediaPlayer.currentPosition.formatMinSec()
-        mBinding?.playMyWorkAudioDurationTxt?.text = mMediaPlayer.duration.formatMinSec()
+        mBinding.playMyWorkAudioProgressTxt.text = mMediaPlayer.currentPosition.formatMinSec()
+        mBinding.playMyWorkAudioDurationTxt.text = mMediaPlayer.duration.formatMinSec()
 
         seekBarUpdater = Handler(Looper.getMainLooper())
-        mBinding?.playMyWorkAudioSeekBar?.maxProgress = mMediaPlayer.duration.toFloat()
+        mBinding.playMyWorkAudioSeekBar.maxProgress = mMediaPlayer.duration.toFloat()
         seekBarUpdater?.post(object : Runnable {
             override fun run() {
                 try {
-                    mBinding?.playMyWorkAudioSeekBar?.progress =
+                    mBinding.playMyWorkAudioSeekBar.progress =
                         mMediaPlayer.currentPosition.toFloat()
-                    mBinding?.playMyWorkAudioProgressTxt?.text =
+                    mBinding.playMyWorkAudioProgressTxt.text =
                         mMediaPlayer.currentPosition.formatMinSec()
                 } catch (_: Exception) {
                 }
@@ -129,6 +132,15 @@ class PlayAudioFragment : Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        resumeAudio()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pauseAudio()
+    }
 
     private fun resumeAudio() {
         mMediaPlayer.start()

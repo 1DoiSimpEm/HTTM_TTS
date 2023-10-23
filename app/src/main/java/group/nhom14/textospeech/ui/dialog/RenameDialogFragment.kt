@@ -1,13 +1,10 @@
 package group.nhom14.textospeech.ui.dialog
 
-import android.app.Dialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import group.nhom14.textospeech.R
 import group.nhom14.textospeech.databinding.FragmentRenameDialogBinding
 
 
@@ -42,6 +39,7 @@ class RenameDialogFragment : DialogFragment() {
     }
 
     private fun initActions() {
+        mBinding.dialogRenameEditTxt.setText(name)
         mBinding.permDialogDeny.setOnClickListener {
             dismiss()
         }

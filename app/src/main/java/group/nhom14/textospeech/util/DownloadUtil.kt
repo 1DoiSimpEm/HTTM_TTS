@@ -13,7 +13,7 @@ import java.io.File
 object DownloadUtil {
     fun downloadAudioFile(url: String, context: Context, callback: (Boolean, String) -> Unit) {
         try {
-            val fileName = System.currentTimeMillis().toString() + ".mp3"
+            val fileName = System.currentTimeMillis().toString() + ".wav"
             val folder = File(context.getExternalFilesDir(null),"downloaded_sounds")
             if (!folder.exists()) {
                 folder.mkdirs()

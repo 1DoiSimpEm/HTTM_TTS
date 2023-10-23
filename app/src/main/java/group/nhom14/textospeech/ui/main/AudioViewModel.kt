@@ -60,14 +60,14 @@ class AudioViewModel : ViewModel() {
     }
 
 
-    fun setRingtone(context: Context, filePath: String, fileName: String) {
+    fun setRingtone(context: Context, filePath: String, fileName: String,callBack:() ->Unit) {
         viewModelScope.launch(Dispatchers.Default) {
-            val file = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) File(
+            val file = File(
                 saveRingTone(
                     fileDir = filePath,
                     newName = fileName
                 )
-            ) else File(filePath)
+            )
             val values = ContentValues()
             values.put(MediaStore.MediaColumns.DATA, file.absolutePath)
             values.put(MediaStore.MediaColumns.TITLE, file.name)
@@ -88,6 +88,7 @@ class AudioViewModel : ViewModel() {
                 RingtoneManager.TYPE_RINGTONE,
                 newUri
             )
+            callBack.invoke()
         }
 
 
