@@ -41,7 +41,8 @@ class AudioFragment : Fragment() {
     private lateinit var audioAdapter: AudioAdapter
 
     companion object {
-        private const val BASE_URL = "https://3bdf-14-231-130-155.ngrok-free.app"
+        private const val BASE_URL = "https://1229-14-231-130-155.ngrok-free.app"
+        private const val MAX_CHUNK_LENGTH = 10
     }
 
     override fun onCreateView(
@@ -113,6 +114,7 @@ class AudioFragment : Fragment() {
                 mBinding.apply {
                     ttsDownloadButton.setBackgroundResource(R.drawable.bg_tts_next_btn)
                     ttsDownloadButton.isEnabled = true
+                    ttsClearButton.visibility = View.VISIBLE
                     ttsPlayButton.setImageResource(R.drawable.ic_tts_playable)
                     mBinding.ttsEditText.setBackgroundResource(R.drawable.bg_langpick_notempty_layout)
                 }
@@ -120,43 +122,67 @@ class AudioFragment : Fragment() {
                 mBinding.apply {
                     ttsDownloadButton.setBackgroundResource(R.drawable.bg_tts_unplayed_button)
                     ttsDownloadButton.isEnabled = false
+                    ttsClearButton.visibility = View.GONE
                     ttsPlayButton.setImageResource(R.drawable.ic_tts_play)
                     mBinding.ttsEditText.setBackgroundResource(R.drawable.bg_langpick_empty_layout)
                 }
             }
         }
 
-        mBinding.ttsPlayButton.setOnClickListener {
-            mBinding.ttsProgressBar.visibility = View.VISIBLE
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                val audioId =
-                    withContext(Dispatchers.Default) {
-                        getAudioId("$BASE_URL/tts?text=${mBinding.ttsEditText.text}")
-                    }
-                if (audioId != null) {
-                    withContext(Dispatchers.Main) {
-                        Log.d("MainActivity", "Audio ID: $audioId")
-                        mediaPlayer = MediaPlayer().apply {
-                            setDataSource("$BASE_URL/audiogen?id=$audioId")
-//                            setDataSource("https://doc-0s-7g-docs.googleusercontent.com/docs/securesc/pf90nneoelfe9erk5nq9uatm55ijlnvt/qr1nuv73fjmvl1gt7a5updoof74cc8a7/1698078975000/12097368366067485510/12097368366067485510/1fZiZjeeXRF9_HP5GpeuKm2v2GhcoFEIm?e=open&ax=AI0foUqKjPFR1kij9maUeQF4Xl4vdxEdJhusWaLhnKglU66gWwDqXSmFx1ReVZ_vioIcwdDtPQzRAAeGgvsOAF9QUEHLOzMLxNcS0cFV-sJX_PU0Cfb_-CfqWft63qcUm0uW61BDMrtUSV3xHlLg980v80bil55RuA8MCBGX2SyFRgmDrazp4dlE3IsvgVSA6daNPn54ULafHq2EVDK_CYxRk_Ry8FcN-lTchZnbx1w-B2kAOUhEt3JG1xnru7KBPHVI3gzRB7olN8NEHNUZ8OS5NFYpCtY6i4ni6dv6ovhdRZ30KKknbcDT-lx2keN3q7Ke8dBWHjKFCsR0WBAQDcGVC-uk642MwoPTeNXfOYYTGyxTK6V2Vu9CzIrQlVcmseIOUMh5Yq4QQetkHZl-5JQ1TLlzG18DjjFsi62CEJryQ9xV-JeKAk5jme8XSG6oztRmKa7LZcHrOEd9zKdSzcop6he8-1ZxnLYf9Ds_P48dkHiyAGLRtUdZ1SJ6njC7I1YkgpwaCp1Z-wswPbgk415turrna6ToFTiegSdQr8HtxEYTOFyztGSczLCeYqvkIGb7CcKsUI0TdfIK9_s-FYEvJzb79np4xj1gMm5pKXevM-WEVfhI4Vql2Z3b_JmW4ACCbRhtzZMpN19Pvv_QyIBgE0LIafXIhjPT7GD5a-D9RMXiWNbguIHjeiRY_n6Me8B1xoCyvTAzJM0X84c3L1gGcTpmXMGFxU644Azyrq7pHTxvrerLDy2ednLrVwpCkBjovMSq8Pel8_pqqYxWKGsD0n7_cjKNK-gWxUN0bivc-XnngtYYguvfOn1DezWlWV084IimTkxSkvLJ9IQJyHjCJRpWmaLuEynbcjVkHHuRNWPDo3o8XfljKx3wVlrlBYo6-jfK9e03S4gX7IY6wevoMHgXk_lLyG-v7U11sS5L_vf8nNhgAUfGf19Z-BVPyB12CzzyYTpSM0fEXEm4VtMi9ZAcTFkejuTzLK9iTCuDzCX4QTpdsd2sNHUjEj2AFZvdtLqK9kcWIZjLXO-wKWZiPCgpyQzGT0Ukm78d5H-oTLSctw&uuid=3beb7788-ad64-4876-8985-d51922a6418d&authuser=0")
-                            prepare()
-                            start()
-                            setOnCompletionListener {
-                                mediaPlayer.release()
-                                mBinding.ttsPlayButton.setImageResource(R.drawable.ic_tts_playable)
-                            }
-                            setOnPreparedListener {
-                                mBinding.ttsPlayButton.setImageResource(R.drawable.ic_tts_pause)
-                                mBinding.ttsProgressBar.visibility = View.GONE
-                            }
-                        }
-                    }
+//        mBinding.ttsPlayButton.setOnClickListener {
+//            mBinding.ttsProgressBar.visibility = View.VISIBLE
+//            val text = mBinding.ttsEditText.text.toString()
+//            val chunks = splitTextIntoChunks(text, MAX_CHUNK_LENGTH)
+//            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+//                for (chunk in chunks) {
+//                    val audioId = withContext(Dispatchers.Default) {
+//                        getAudioId("$BASE_URL/tts?text=$chunk")
+//                    }
+//                    if (audioId != null) {
+//                        withContext(Dispatchers.Main) {
+//                            Log.d("MainActivity", "Audio ID: $audioId")
+//                            mediaPlayer = MediaPlayer().apply {
+//                                setDataSource("$BASE_URL/audiogen?id=$audioId")
+//                                prepare()
+//                                start()
+//                                setOnCompletionListener {
+//                                    mediaPlayer.release()
+//                                    mBinding.ttsPlayButton.setImageResource(R.drawable.ic_tts_playable)
+//                                }
+//                                setOnPreparedListener {
+//                                    mBinding.ttsPlayButton.setImageResource(R.drawable.ic_tts_pause)
+//                                    mBinding.ttsProgressBar.visibility = View.GONE
+//                                }
+//                            }
+//                        }
+//                    } else {
+//                        Log.d("MainActivity", "Error getting audio ID")
+//                    }
+//                }
+//            }
+//        }
 
-                } else {
-                    Log.d("MainActivity", "Error getting audio ID")
+
+        mBinding.ttsClearButton.setOnClickListener {
+            mBinding.ttsEditText.text.clear()
+            mBinding.ttsPlayButton.isEnabled = true
+            try {
+                mediaPlayer.release()
+            } catch (_: Exception) {
+            }
+        }
+
+        mBinding.ttsPlayButton.setOnClickListener {
+            try{
+                mBinding.ttsProgressBar.visibility = View.VISIBLE
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    val text = mBinding.ttsEditText.text.toString()
+                    val sentences = text.split("[.!?]".toRegex())
+                    playSentences(sentences, 0)
                 }
             }
-
+            catch (_:Exception){
+            }
         }
 
         mBinding.ttsDownloadButton.setOnClickListener {
@@ -194,6 +220,56 @@ class AudioFragment : Fragment() {
         }
     }
 
+    private suspend fun playSentences(sentences: List<String>, index: Int) {
+        if (index < sentences.size && sentences[index].isNotEmpty()) {
+            val audioId = withContext(Dispatchers.Default) {
+                getAudioId("$BASE_URL/tts?text=${sentences[index]}")
+            }
+            if (audioId != null) {
+                withContext(Dispatchers.Main) {
+                    Log.d("MainActivity", "$BASE_URL/audiogen?id=$audioId")
+                    mediaPlayer = MediaPlayer().apply {
+                        setDataSource("$BASE_URL/audiogen?id=$audioId")
+                        prepare()
+                        start()
+                        setOnCompletionListener {
+                            if(index == sentences.size - 1){
+                                mediaPlayer.release()
+                                mBinding.ttsPlayButton.setImageResource(R.drawable.ic_tts_playable)
+                                mBinding.ttsPlayButton.isEnabled = true
+                            }
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                playSentences(sentences, index + 1)
+                            }
+                        }
+                        setOnPreparedListener {
+                            mBinding.ttsPlayButton.isEnabled = false
+                            mBinding.ttsPlayButton.setImageResource(R.drawable.ic_tts_pause)
+                            mBinding.ttsProgressBar.visibility = View.GONE
+                        }
+                    }
+                }
+            } else {
+                Log.d("MainActivity", "Error getting audio ID")
+            }
+        }
+    }
+
+//    private fun splitTextIntoChunks(text: String, maxLength: Int): List<String> {
+//        val chunks = mutableListOf<String>()
+//        var startIndex = 0
+//        while (startIndex < text.length) {
+//            val endIndex = startIndex + maxLength
+//            val chunk = if (endIndex < text.length) {
+//                text.substring(startIndex, endIndex)
+//            } else {
+//                text.substring(startIndex)
+//            }
+//            chunks.add(chunk)
+//            startIndex = endIndex
+//        }
+//        return chunks
+//    }
 
     private suspend fun getAudioId(url: String): String? = suspendCoroutine { continuation ->
         val request = Request.Builder().url(url).build()
